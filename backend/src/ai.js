@@ -1,17 +1,72 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
 /**
- * Initialize Gemini client helper
- * @param {string} apiKey 
- * @returns {GoogleGenerativeAI}
+ * AI Service using direct Google Gemini API endpoints via native fetch.
+ * Bypasses the SDK to avoid header-stripping by corporate proxies and environment conflicts.
  */
-function getClient(apiKey) {
+
+function getApiKey(apiKey) {
   const key = apiKey || process.env.GEMINI_API_KEY;
   if (!key) {
     throw new Error('Gemini API key is required. Please set it in Settings or backend environment variables.');
   }
-  // Standard initialization of Gemini SDK
-  return new GoogleGenerativeAI({ apiKey: key });
+  return key;
+}
+
+/**
+ * Common call helper to Gemini API
+ * @param {string} model 
+ * @param {string} prompt 
+ * @param {string} apiKey 
+ * @returns {Promise<string>} Raw text response from Gemini
+ */
+async function callGemini(model, prompt, apiKey) {
+  const key = getApiKey(apiKey);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      contents: [
+        {
+          parts: [
+            {
+              text: prompt
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        responseMimeType: 'application/json'
+      }
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`[Gemini API Error] Status: ${response.status}, Detail: ${errorText}`);
+    let message = `Gemini API returned ${response.status} ${response.statusText}`;
+    try {
+      const errJson = JSON.parse(errorText);
+      if (errJson.error && errJson.error.message) {
+        message = errJson.error.message;
+      }
+    } catch {}
+    throw new Error(message);
+  }
+
+  const data = await response.json();
+  
+  try {
+    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+      return data.candidates[0].content.parts[0].text;
+    }
+  } catch (err) {
+    console.error('[Gemini API Parsing Error] Response structure unexpected:', data);
+  }
+  
+  throw new Error('Gemini API returned an empty or invalid response structure.');
 }
 
 /**
@@ -22,12 +77,6 @@ function getClient(apiKey) {
  * @returns {Promise<Array<Object>>} List of { code, name, description }
  */
 export async function deconstructRequirements(text, apiKey, model = 'gemini-3.5-flash') {
-  const ai = getClient(apiKey);
-  const genModel = ai.getGenerativeModel({ 
-    model: model,
-    generationConfig: { responseMimeType: 'application/json' }
-  });
-
   const prompt = `你是一位專業的需求工程師。請分析以下從客戶需求書 (RFP) 或系統規格書中擷取出的文字內容。
 將其拆解成一個個獨立且具體的「需求項目」（Requirements）。
 
@@ -43,8 +92,7 @@ export async function deconstructRequirements(text, apiKey, model = 'gemini-3.5-
 ${text}
 """`;
 
-  const response = await genModel.generateContent(prompt);
-  const jsonText = response.response.text();
+  const jsonText = await callGemini(model, prompt, apiKey);
   return JSON.parse(jsonText);
 }
 
@@ -56,12 +104,6 @@ ${text}
  * @returns {Promise<Array<Object>>} List of { code, name, description }
  */
 export async function deconstructFunctions(text, apiKey, model = 'gemini-3.5-flash') {
-  const ai = getClient(apiKey);
-  const genModel = ai.getGenerativeModel({ 
-    model: model,
-    generationConfig: { responseMimeType: 'application/json' }
-  });
-
   const prompt = `你是一位系統分析師 (SA)。請分析以下從系統功能規格書 (FSD/SD) 或架構設計文件中擷取出的文字內容。
 將其拆解成一個個獨立且具體的「系統功能項目」（Functions/Features）。
 
@@ -77,8 +119,7 @@ export async function deconstructFunctions(text, apiKey, model = 'gemini-3.5-fla
 ${text}
 """`;
 
-  const response = await genModel.generateContent(prompt);
-  const jsonText = response.response.text();
+  const jsonText = await callGemini(model, prompt, apiKey);
   return JSON.parse(jsonText);
 }
 
@@ -91,12 +132,6 @@ ${text}
  * @returns {Promise<Array<Object>>} List of { requirementCode, functionCode, confidence, reason }
  */
 export async function alignTraceability(requirements, functions, apiKey, model = 'gemini-3.5-flash') {
-  const ai = getClient(apiKey);
-  const genModel = ai.getGenerativeModel({ 
-    model: model,
-    generationConfig: { responseMimeType: 'application/json' }
-  });
-
   const prompt = `你是一位系統工程師。現在你需要將「客戶需求清單」與「開發功能清單」進行對齊，建立需求追溯關係 (Requirement Traceability Matrix)。
 請評估每個功能（Function）是否能滿足或實現特定需求（Requirement）。
 
@@ -116,7 +151,6 @@ ${JSON.stringify(functions, null, 2)}
 
 請僅回傳 JSON 陣列。若某個需求沒有適合的功能對應，無須建立關聯。僅回傳有合理關聯的項目。`;
 
-  const response = await genModel.generateContent(prompt);
-  const jsonText = response.response.text();
+  const jsonText = await callGemini(model, prompt, apiKey);
   return JSON.parse(jsonText);
 }

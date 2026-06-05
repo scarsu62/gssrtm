@@ -72,6 +72,20 @@ function getApiKey(req) {
   return '';
 }
 
+// Helper to resolve model name upgrades (maps legacy 2.5 models to 3.5)
+function resolveModel(modelName) {
+  const name = modelName || 'gemini-3.5-flash';
+  if (name === 'gemini-2.5-flash') {
+    console.log('[Model Resolve] Upgrading legacy gemini-2.5-flash to gemini-3.5-flash');
+    return 'gemini-3.5-flash';
+  }
+  if (name === 'gemini-2.5-pro') {
+    console.log('[Model Resolve] Upgrading legacy gemini-2.5-pro to gemini-3.5-pro');
+    return 'gemini-3.5-pro';
+  }
+  return name;
+}
+
 // === API ROUTES ===
 
 // 1. Projects
@@ -183,7 +197,7 @@ app.post('/api/projects/:projectId/requirements/import', upload.single('file'), 
     const file = req.file;
     const useAI = req.body.useAI === 'true';
     const apiKey = getApiKey(req);
-    const model = req.body.model || 'gemini-3.5-flash';
+    const model = resolveModel(req.body.model);
     
     console.log(`[Import Requirements] Request received for project ${projectId}`);
     if (!file) {
@@ -417,7 +431,7 @@ app.post('/api/projects/:projectId/functions/import', upload.single('file'), asy
     const file = req.file;
     const useAI = req.body.useAI === 'true';
     const apiKey = getApiKey(req);
-    const model = req.body.model || 'gemini-3.5-flash';
+    const model = resolveModel(req.body.model);
     
     if (!file) return res.status(400).json({ error: 'No file uploaded' });
     
@@ -615,7 +629,7 @@ app.post('/api/projects/:projectId/mappings/ai-align', async (req, res) => {
   try {
     const { projectId } = req.params;
     const apiKey = getApiKey(req);
-    const model = req.body.model || 'gemini-3.5-flash';
+    const model = resolveModel(req.body.model);
     const singleReqId = req.body.requirementId; // Optional: align only one requirement
     
     if (!apiKey) {

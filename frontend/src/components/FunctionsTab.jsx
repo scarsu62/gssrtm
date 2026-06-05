@@ -191,7 +191,7 @@ function FunctionsTab({ projectId, functions, refreshData, showAlert, apiKey, mo
           <div className="modal-content">
             <div className="modal-header">
               <h3>{editingItem ? '📝 編輯功能設計' : '➕ 新增功能項目'}</h3>
-              <button style={{ background: 'transparent', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setShowAddModal(false)}>✖</button>
+              <button style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setShowAddModal(false)}>✖</button>
             </div>
             <form onSubmit={handleSave}>
               <div className="modal-body">
@@ -223,7 +223,7 @@ function FunctionsTab({ projectId, functions, refreshData, showAlert, apiKey, mo
           <div className="modal-content">
             <div className="modal-header">
               <h3>📥 匯入系統功能規格設計書 (SD/FSD)</h3>
-              <button style={{ background: 'transparent', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setShowImportModal(false)}>✖</button>
+              <button style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setShowImportModal(false)}>✖</button>
             </div>
             <form onSubmit={handleImport}>
               <div className="modal-body">

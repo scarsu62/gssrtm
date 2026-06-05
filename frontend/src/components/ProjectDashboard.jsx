@@ -89,7 +89,7 @@ function ProjectDashboard({ projects, loading, onCreateProject, onSelectProject,
           <div className="modal-content">
             <div className="modal-header">
               <h3>🆕 建立新專案</h3>
-              <button style={{ background: 'transparent', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setShowCreateModal(false)}>
+              <button style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setShowCreateModal(false)}>
                 ✖
               </button>
             </div>

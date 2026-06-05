@@ -1,0 +1,15 @@
+【智慧圖書管理系統 - 系統功能設計說明書 (FSD)】
+
+1. 使用者權限模組
+- FUN-001：Google OAuth 整合介面。實作前端 Google 登入按鈕，並於後端驗證 ID Token。
+- FUN-002：密碼重設與信件發送服務。整合 Nodemailer 模組，發送包含 UUID token 密碼重設網址的信件。
+- FUN-003：後台權限管制攔截器。實作 Express Middleware，驗證使用者 JWT Token 中的角色欄位（Reader/Admin）。
+
+2. 圖書檢索與借閱功能
+- FUN-004：圖書搜尋 API 與搜尋框。支援 SQL LIKE 模糊比對書名、作者與 ISBN 欄位，並實作前端分頁搜尋框。
+- FUN-005：借閱清單與購物車頁面。提供前端 LocalStorage 暫存購物車內容，並支援批次發送借閱 API。
+- FUN-006：排程借閱催還通知服務。使用 node-cron 每天凌晨掃描資料庫中即將到期借閱紀錄，符合條件者觸發電子郵件發送。
+
+3. 後台管理模組
+- FUN-007：圖書資料庫 CRUD 介面。提供管理員專用之圖書管理頁面與相關 RESTful APIs。
+- FUN-008：借閱數據統計儀表板。使用 Chart.js 呈現熱門圖書排行榜，並整合 exceljs 匯出報表。

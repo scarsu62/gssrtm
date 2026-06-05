@@ -1,4 +1,4 @@
-# GSS RTM (Requirement Traceability Matrix) 需求追蹤矩陣系統
+# RTM (Requirement Traceability Matrix) 需求追蹤矩陣系統
 
 一個專為專案經理與開發團隊設計的**互動式 AI 輔助需求追蹤矩陣 (RTM)** 系統。本系統採用輕量級淺色微光風 (Glassmorphism) 設計，提供直觀、流暢的需求與功能對照管理，並整合 Google Gemini AI 進行智慧需求拆解與自動關聯推薦。
 
@@ -8,7 +8,7 @@
 
 1. **專案管理 (Project Management)**
    - 支援建立、讀取、更新、刪除多個專案。
-   - 所有專案數據均儲存於本地 JSON 檔案資料庫（免去 Windows 環境安裝/編譯原生 DB 套件的痛點）。
+   - 所有專案數據均儲存於本地 JSON 檔案資料庫（免去複雜的原生 DB 套件安裝與編譯）。
 
 2. **需求管理與 AI 拆解 (Requirements & AI Parser)**
    - 支援導入客戶 RFP 檔案（Excel `.xlsx`/`.xls`、Word `.docx` 或純文字 `.txt`）。
@@ -45,7 +45,7 @@ RTM/
 ├── backend/               # 後端服務 (Express.js)
 │   ├── data/              # 本地 JSON 資料庫目錄
 │   ├── src/
-│   │   ├── ai.js          # Gemini REST API 呼叫邏輯 (繞過 GSS 代理限制)
+│   │   ├── ai.js          # Gemini REST API 呼叫邏輯
 │   │   ├── db.js          # 本地 JSON CRUD 資料庫管理
 │   │   ├── parser.js      # Word/Excel/TXT 文件解析器
 │   │   └── index.js       # Express 路由、版本 Diff 與主程式
@@ -93,23 +93,18 @@ RTM/
    - 開啟新的 PowerShell 視窗啟動後端 (Port `5000`)。
    - 開啟新的 PowerShell 視窗啟動前端 (Port `5173`)。
 
-3. 啟動完成後，瀏覽器會自動或手動打開：[http://localhost:5173](http://localhost:5173)
+3. 啟動完成後，瀏覽器會自動或手動開啟：[http://localhost:5173](http://localhost:5173)
 
 ---
 
-## 🔌 AI 設定與企業防火牆 (GSS Proxy) 特殊處理
+## 🔌 AI 設定與 API 金鑰配置
 
-由於 GSS (Galaxy Software Services) 企業網路防火牆與 Proxy 會**自動過濾/阻擋自訂 HTTP 標頭 (Custom Headers)**，導致官方的 Google AI SDK (`@google/generative-ai`) 在發送請求時，因其專用的標頭 `x-goog-api-key` 被 Proxy 剔除而回傳 `400 API key not valid` 錯誤。
-
-**本專案已對此進行了底層解決方案優化：**
-* **無 SDK 直接呼叫 (Rest Bypass)**：後端 `ai.js` 棄用官方 SDK，直接使用原生的 `fetch` 對 Google Gemini API 端點進行 REST 呼叫。
-* **網址參數傳遞金鑰**：改將 API Key 附加於網址參數中（`?key=YOUR_API_KEY`），成功繞過企業 Proxy 對標頭的過濾，確保在 GSS 內網環境下也能順暢使用 AI 功能。
-* **模型自動升級**：系統預設支援最新的 `gemini-2.5-flash` 與 `gemini-3.5-flash` 等模型。若前端快取了舊版模型設定，後端 `resolveModel` 模組將會自動對齊並升級，防止 API 呼叫失敗。
+本系統的 AI 功能基於 Google Gemini REST API 進行整合，具備高相容性與快速回應的特點。
 
 ### 如何配置 API 金鑰：
 1. 進入系統後，點擊右上角或側邊欄的 **「系統設定」 (Settings)**。
-2. 輸入您的 Google AI Studio API Key (通常以 `AIzaSy...` 或最新的 `AQ.Ab...` 開頭)。
-3. 選擇模型（預設為 `gemini-3.5-flash` 以獲得最佳速度與分析品質）。
+2. 輸入您的 Gemini API Key (通常以 `AIzaSy...` 或 `AQ.Ab...` 開頭)。
+3. 選擇模型（預設建議為 `gemini-3.5-flash` 以獲得最佳速度與分析品質）。
 4. 點擊儲存，設定值將安全的儲存在您瀏覽器的 `localStorage` 中，後續的操作將自動帶上此金鑰。
 
 ---

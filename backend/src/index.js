@@ -691,6 +691,22 @@ app.post('/api/projects/:projectId/mappings/ai-align', async (req, res) => {
   }
 });
 
+// Serve static assets from frontend build
+const frontendDistPath = path.join(__dirname, '..', '..', 'frontend', 'dist');
+app.use(express.static(frontendDistPath));
+
+// Wildcard route to serve index.html for React SPA
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  res.sendFile(path.join(frontendDistPath, 'index.html'), (err) => {
+    if (err) {
+      res.status(404).send('RTM Application frontend not built yet. Please run build script first.');
+    }
+  });
+});
+
 // Start server
 app.listen(PORT, async () => {
   try {

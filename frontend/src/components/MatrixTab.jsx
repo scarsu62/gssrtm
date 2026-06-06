@@ -41,7 +41,7 @@ function MatrixTab({ projectId, requirements, functions, mappings, refreshData, 
           </p>
         </div>
         {/* Legend */}
-        <div style={{ display: 'flex', gap: '20px', fontSize: '0.85rem', background: 'rgba(255,255,255,0.02)', padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ display: 'flex', gap: '20px', fontSize: '0.85rem', background: 'rgba(0,0,0,0.02)', padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div className="matrix-dot confirmed" style={{ width: '14px', height: '14px', boxShadow: 'none' }}></div>
             <span>手動確認/已儲存</span>
@@ -69,11 +69,11 @@ function MatrixTab({ projectId, requirements, functions, mappings, refreshData, 
             <thead>
               <tr>
                 {/* Top-Left empty sticky corner */}
-                <th className="sticky-top-left" style={{ minWidth: '250px', textAlign: 'left', background: 'rgba(20, 15, 45, 0.95)' }}>
+                <th className="sticky-top-left" style={{ minWidth: '250px', textAlign: 'left' }}>
                   需求項目 (列) \ 功能項目 (欄)
                 </th>
                 {functions.map((fun) => (
-                  <th key={fun.id} className="sticky-top" style={{ width: '60px', background: 'rgba(20, 15, 45, 0.95)' }} title={`${fun.code}: ${fun.name}`}>
+                  <th key={fun.id} className="sticky-top" style={{ width: '60px' }} title={`${fun.code}: ${fun.name}`}>
                     <div className="vertical-header-text">
                       {fun.code}
                     </div>
@@ -85,7 +85,7 @@ function MatrixTab({ projectId, requirements, functions, mappings, refreshData, 
               {requirements.map((req) => (
                 <tr key={req.id}>
                   {/* Sticky left row label */}
-                  <td className="sticky-left" style={{ background: 'rgba(20, 15, 45, 0.95)' }} title={`${req.code}: ${req.name}`}>
+                  <td className="sticky-left" title={`${req.code}: ${req.name}`}>
                     <span style={{ color: 'var(--color-accent-cyan)', fontWeight: 'bold' }}>{req.code}</span>
                     <span style={{ marginLeft: '8px', fontSize: '0.85rem' }}>{req.name}</span>
                   </td>

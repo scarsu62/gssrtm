@@ -230,6 +230,9 @@ app.post('/api/projects/:projectId/requirements/import', upload.single('file'), 
     }
     
     console.log(`[Import Requirements] Parsed raw text length: ${parsedText ? parsedText.length : 0} characters`);
+    if (parsedText) {
+      console.log(`[Import Requirements] Snippet of parsed text: "${parsedText.substring(0, 150).replace(/\n/g, ' ')}"`);
+    }
 
     // Clean up uploaded file
     await fs.unlink(file.path);
@@ -451,6 +454,11 @@ app.post('/api/projects/:projectId/functions/import', upload.single('file'), asy
       parsedText = await fs.readFile(file.path, 'utf-8');
     } else {
       return res.status(400).json({ error: 'Unsupported file format' });
+    }
+    
+    console.log(`[Import Functions] Parsed raw text length: ${parsedText ? parsedText.length : 0} characters`);
+    if (parsedText) {
+      console.log(`[Import Functions] Snippet of parsed text: "${parsedText.substring(0, 150).replace(/\n/g, ' ')}"`);
     }
     
     await fs.unlink(file.path);
